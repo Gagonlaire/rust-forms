@@ -6,7 +6,9 @@ mod config;
 mod database;
 mod models;
 mod utils;
+mod filters;
 
+use std::sync::Arc;
 use config::{AppData, Config};
 
 fn setup() {
@@ -21,10 +23,10 @@ async fn main() {
 
     let config = Config::default();
     let pool = database::create_connection_pool(&config.database_url);
-    let app_data = AppData {
+    let app_data = Arc::new(AppData {
         config,
         pool
-    };
+    });
 
     warp::serve(routes::build(&app_data)).run(app_data.config.host).await;
 }
