@@ -4,6 +4,7 @@ extern crate diesel;
 mod routes;
 mod config;
 mod database;
+mod models;
 mod utils;
 
 use config::{AppData, Config};

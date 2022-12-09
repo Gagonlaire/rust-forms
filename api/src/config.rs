@@ -13,9 +13,6 @@ pub struct AppData {
 pub struct Config {
     pub host: SocketAddr,
     pub database_url: String,
-    pub major_version: u16,
-    pub minor_version: u16,
-    pub patch_version: u16,
 }
 
 impl Default for Config {
@@ -26,9 +23,6 @@ impl Default for Config {
                 get_env_var_with_default("PORT", 3000)
             )),
             database_url: get_env_var("DATABASE_URL", "DATABASE_URL must be set"),
-            major_version: get_env_var_with_default("MAJOR_VERSION", 0),
-            minor_version: get_env_var_with_default("MINOR_VERSION", 0),
-            patch_version: get_env_var_with_default("PATCH_VERSION", 0),
         }
     }
 }
