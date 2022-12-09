@@ -4,9 +4,9 @@ extern crate diesel;
 mod routes;
 mod config;
 mod database;
+mod utils;
 
-use config::{AppData};
-use crate::config::Config;
+use config::{AppData, Config};
 
 fn setup() {
     dotenv::dotenv().ok();
@@ -25,5 +25,5 @@ async fn main() {
         pool
     };
 
-    warp::serve(routes::build()).run(app_data.config.host).await;
+    warp::serve(routes::build(&app_data)).run(app_data.config.host).await;
 }
