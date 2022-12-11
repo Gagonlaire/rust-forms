@@ -8,8 +8,7 @@ mod models;
 mod utils;
 mod filters;
 
-use std::sync::Arc;
-use config::{AppData, Config};
+use config::{Config};
 
 fn setup() {
     dotenv::dotenv().ok();
@@ -22,11 +21,8 @@ async fn main() {
     setup();
 
     let config = Config::default();
-    let pool = database::create_connection_pool(&config.database_url);
-    let app_data = Arc::new(AppData {
-        config,
-        pool
-    });
+    let pool = database::establish_connection(&config.database_url);
+    let test = config.host;
 
-    warp::serve(routes::build(&app_data)).run(app_data.config.host).await;
+    warp::serve(routes::build(config, pool)).run(test).await;
 }

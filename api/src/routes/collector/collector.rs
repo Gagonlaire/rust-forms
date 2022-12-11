@@ -1,13 +1,11 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 use warp::{Filter, Reply};
-use crate::config::AppData;
 
 fn collector_handler(form_id: String, body: HashMap<String, String>) -> impl Reply {
     warp::reply::with_status("collector", warp::http::StatusCode::OK)
 }
 
-pub fn get_collector(app_data: &Arc<AppData>) -> impl Filter<Extract = impl Reply, Error = warp::Rejection> + Clone {
+pub fn get_collector() -> impl Filter<Extract = impl Reply, Error = warp::Rejection> + Clone {
     warp::path!("collector" / String)
         .and(warp::post())
         .and(warp::body::content_length_limit(1024 * 16))

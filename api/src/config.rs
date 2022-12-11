@@ -4,12 +4,6 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use crate::utils::{get_env_var, get_env_var_with_default};
 
 #[derive(Debug)]
-pub struct AppData {
-    pub config: Config,
-    pub pool: Pool<ConnectionManager<PgConnection>>,
-}
-
-#[derive(Debug)]
 pub struct Config {
     pub host: SocketAddr,
     pub database_url: String,
