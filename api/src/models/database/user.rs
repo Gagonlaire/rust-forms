@@ -1,9 +1,8 @@
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
-use super::super::schema::users;
+use crate::database::schema::users;
 
-#[derive(Debug, Queryable, AsChangeset)]
-pub struct User {
+#[derive(Debug, Queryable, Clone)]
+pub struct UserDTO {
     pub id: i32,
     pub username: String,
     pub email: String,
@@ -11,9 +10,8 @@ pub struct User {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = users)]
-#[derive(Serialize, Deserialize, Debug)]
 pub struct NewUser {
     pub username: String,
     pub email: String,

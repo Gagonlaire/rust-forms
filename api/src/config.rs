@@ -1,6 +1,4 @@
 use std::net::{IpAddr, SocketAddr};
-use diesel::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool};
 use crate::utils::{get_env_var, get_env_var_with_default};
 
 #[derive(Debug)]

@@ -21,8 +21,8 @@ async fn main() {
     setup();
 
     let config = Config::default();
-    let pool = database::establish_connection(&config.database_url);
-    let test = config.host;
+    let pool = database::establish_pool_connection(&config.database_url);
+    let host = config.host;
 
-    warp::serve(routes::build(config, pool)).run(test).await;
+    warp::serve(routes::build(config, pool)).run(host).await;
 }
