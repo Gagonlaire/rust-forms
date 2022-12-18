@@ -1,10 +1,13 @@
+use std::convert::Infallible;
 use jsonschema::JSONSchema;
 use warp::{Filter, reject};
 use crate::database::{DbConnection, DbPool};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use warp::body::json;
-use crate::errors::AppError;
+use crate::config::Config;
+use crate::rejections::ApiReject;
+use crate::database::DbConn;
 
 static DEFAULT_MAX_JSON_SIZE: u64 = 16 * 1024;
 
@@ -16,9 +19,15 @@ pub fn with_db_connection(
         .and_then(|pool: DbPool| async move {
             match pool.get() {
                 Ok(conn) => Ok(DbConnection::new(conn)),
-                Err(error) => Err(reject::custom(AppError::from_diesel_error(error)))
+                Err(error) => Err(reject::custom(ApiReject::from_diesel_error(error)))
             }
         })
+}
+
+pub fn with_config(
+    config: Config
+) -> impl Filter<Extract=(Config, ), Error=Infallible> + Clone {
+    warp::any().map(move || config.clone())
 }
 
 pub fn with_json_body<T: DeserializeOwned + Send>(

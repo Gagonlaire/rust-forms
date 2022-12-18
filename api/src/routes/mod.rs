@@ -8,11 +8,11 @@ mod forms;
 use warp::{Filter};
 use crate::config::{Config};
 use crate::database::{DbPool};
-use crate::filters::handle_rejection;
+use crate::filters::{handle_rejection, with_config};
 
-pub fn build(config: &Config, db_pool: DbPool) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+pub fn build(config: Config, db_pool: DbPool) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     let collector = collector::register();
-    let auth_routes = auth::register(db_pool);
+    let auth_routes = auth::register(config, db_pool);
     let forms_routes = forms::register();
 
     warp::path!("api" / "v1" / ..)

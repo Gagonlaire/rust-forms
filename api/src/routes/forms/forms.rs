@@ -1,7 +1,6 @@
 use jsonschema::JSONSchema;
-use serde_json::Value;
 use warp::{Filter, Reply};
-use crate::filters::{with_json_body, with_json_schema};
+use crate::filters::with_json_schema;
 
 pub fn register() -> impl Filter<Extract = impl Reply, Error = warp::Rejection> + Clone {
     let get_form = warp::path!("forms" / String)
@@ -30,14 +29,14 @@ async fn get_form(form_id: String) -> Result<impl Reply, warp::Rejection> {
 }
 
 async fn create_form(schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
-    println!("{:?}", schema);
+    println!("{schema:?}");
     Ok("create form")
 }
 
-async fn delete_form(form_id: String) -> Result<impl Reply, warp::Rejection> {
+async fn delete_form(_form_id: String) -> Result<impl Reply, warp::Rejection> {
     Ok("delete form")
 }
 
-async fn update_form(form_id: String, schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
+async fn update_form(_form_id: String, _schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
     Ok("update form")
 }

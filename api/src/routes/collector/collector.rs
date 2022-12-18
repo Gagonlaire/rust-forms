@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use serde_json::Value;
 use warp::{Filter, Reply};
 use crate::filters::with_json_body;
@@ -10,6 +9,6 @@ pub fn register() -> impl Filter<Extract = impl Reply, Error = warp::Rejection> 
         .map(collector_handler)
 }
 
-fn collector_handler(form_id: String, body: Value) -> impl Reply {
+fn collector_handler(_form_id: String, _body: Value) -> impl Reply {
     warp::reply::with_status("collector", warp::http::StatusCode::OK)
 }

@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use log::error;
 use serde::Serialize;
 use warp::{Rejection, Reply};
-use crate::errors::AppError;
+use crate::rejections::ApiReject;
 
 #[derive(Serialize)]
 struct ErrorMessage {
@@ -21,6 +21,10 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
     if err.is_not_found() {
         code = warp::http::StatusCode::NOT_FOUND;
         message = "Not Found";
+    } else if let Some(error) = err.find::<ApiReject>() {
+        message = error.message.as_str();
+        code = error.code;
+        errors = error.errors.clone();
     } else if let Some(error) = err.find::<warp::filters::body::BodyDeserializeError>() {
         code = warp::http::StatusCode::BAD_REQUEST;
         message = "Invalid Body";
