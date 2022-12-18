@@ -2,15 +2,24 @@
 mod auth;
 #[path = "collector/collector.rs"]
 mod collector;
+#[path = "forms/forms.rs"]
+mod forms;
 
 use warp::{Filter};
 use crate::config::{Config};
 use crate::database::{DbPool};
+use crate::filters::handle_rejection;
 
-pub fn build(config: Config, db_pool: DbPool) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
-    let collector = collector::get_collector();
-    let auth_routes = auth::get_auth_routes();
+pub fn build(config: &Config, db_pool: DbPool) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    let collector = collector::register();
+    let auth_routes = auth::register(db_pool);
+    let forms_routes = forms::register();
 
-    collector
-        .or(auth_routes)
+    warp::path!("api" / "v1" / ..)
+        .and(
+            collector
+                .or(auth_routes)
+                .or(forms_routes)
+                .recover(handle_rejection)
+        )
 }

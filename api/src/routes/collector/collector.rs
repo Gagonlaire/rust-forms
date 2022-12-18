@@ -1,14 +1,15 @@
 use std::collections::HashMap;
+use serde_json::Value;
 use warp::{Filter, Reply};
+use crate::filters::with_json_body;
 
-fn collector_handler(form_id: String, body: HashMap<String, String>) -> impl Reply {
-    warp::reply::with_status("collector", warp::http::StatusCode::OK)
-}
-
-pub fn get_collector() -> impl Filter<Extract = impl Reply, Error = warp::Rejection> + Clone {
+pub fn register() -> impl Filter<Extract = impl Reply, Error = warp::Rejection> + Clone {
     warp::path!("collector" / String)
         .and(warp::post())
-        .and(warp::body::content_length_limit(1024 * 16))
-        .and(warp::body::json())
+        .and(with_json_body(None))
         .map(collector_handler)
+}
+
+fn collector_handler(form_id: String, body: Value) -> impl Reply {
+    warp::reply::with_status("collector", warp::http::StatusCode::OK)
 }

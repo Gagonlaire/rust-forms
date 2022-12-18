@@ -7,6 +7,7 @@ mod database;
 mod models;
 mod utils;
 mod filters;
+mod errors;
 
 use config::{Config};
 
@@ -22,7 +23,6 @@ async fn main() {
 
     let config = Config::default();
     let pool = database::establish_pool_connection(&config.database_url);
-    let host = config.host;
 
-    warp::serve(routes::build(config, pool)).run(host).await;
+    warp::serve(routes::build(&config, pool)).run(config.host).await;
 }
