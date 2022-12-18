@@ -12,8 +12,8 @@ use crate::filters::{handle_rejection, with_config};
 
 pub fn build(config: Config, db_pool: DbPool) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     let collector = collector::register();
-    let auth_routes = auth::register(config, db_pool);
-    let forms_routes = forms::register();
+    let auth_routes = auth::register(config.clone(), db_pool);
+    let forms_routes = forms::register(config);
 
     warp::path!("api" / "v1" / ..)
         .and(
