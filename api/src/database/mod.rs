@@ -1,10 +1,35 @@
-use diesel::{PgConnection, r2d2};
+use diesel::{PgConnection, QueryResult, r2d2};
 use diesel::r2d2::{ConnectionManager, PooledConnection};
+use diesel::result::{Error, DatabaseErrorKind};
+use log::error;
 
 pub mod actions;
 pub mod schema;
-pub mod models {
-    pub use crate::models::database::*;
+
+pub enum DbResult<T> {
+    Ok(T),
+    NotFound,
+    UniqueViolation,
+    Unknown,
+}
+
+impl<T> From<QueryResult<T>> for DbResult<T> {
+    fn from(result: QueryResult<T>) -> Self {
+        match result {
+            Ok(value) => DbResult::Ok(value),
+            Err(error) => {
+                match error {
+                    Error::NotFound => DbResult::NotFound,
+                    Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _) =>
+                        DbResult::UniqueViolation,
+                    _ => {
+                        error!("Database error: {}", error);
+                        DbResult::Unknown
+                    }
+                }
+            }
+        }
+    }
 }
 
 pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;

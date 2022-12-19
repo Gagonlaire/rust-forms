@@ -9,7 +9,7 @@ use warp::body::json;
 use crate::config::Config;
 use crate::rejections::ApiReject;
 use crate::database::DbConn;
-use crate::utils::jwt::{JWT, verify_token};
+use crate::utils::jwt::{Jwt, verify_token};
 
 static DEFAULT_MAX_JSON_SIZE: u64 = 16 * 1024;
 
@@ -54,21 +54,20 @@ pub fn with_json_schema(
 
 pub fn with_jwt_auth(
     config: Config
-) -> impl Filter<Extract=(u64, ), Error=warp::Rejection> + Clone {
+) -> impl Filter<Extract=(i64, ), Error=warp::Rejection> + Clone {
     warp::header::optional::<String>("Authorization")
         .and(with_config(config))
         .and_then(|token: Option<String>, config: Config| async move {
-            match token {
-                Some(token) => {
-                    let token = token.trim_start_matches("Bearer ");
+            if token.is_none() {
+                return Err(reject::custom(
+                    ApiReject::unauthorized("Missing token", None)
+                ));
+            }
+            let token = token.unwrap();
 
-                    match verify_token(&token, &config) {
-                        JWT::Valid(id) => Ok(id),
-                        JWT::Unknown => Err(reject::custom(ApiReject::internal_error())),
-                        err => Err(reject::custom(ApiReject::unauthorized(err.to_string(), None)))
-                    }
-                }
-                None => Err(reject::custom(ApiReject::unauthorized("No token provided", None)))
+            match verify_token(token.trim_start_matches("Bearer "), &config) {
+                Jwt::Valid(id) => Ok(id),
+                error => Err(reject::custom(ApiReject::from(error)))
             }
         })
 }

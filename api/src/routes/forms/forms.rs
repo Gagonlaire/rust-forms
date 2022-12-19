@@ -29,19 +29,19 @@ pub fn register(config: Config) -> impl Filter<Extract = impl Reply, Error = war
         .or(delete_form)
 }
 
-async fn get_form(form_id: String, user_id: u64) -> Result<impl Reply, warp::Rejection> {
+async fn get_form(form_id: String, user_id: i64) -> Result<impl Reply, warp::Rejection> {
     Ok(format!("get form {}", form_id))
 }
 
-async fn create_form(user_id: u64, schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
+async fn create_form(user_id: i64, schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
     println!("{schema:?}");
     Ok("create form")
 }
 
-async fn delete_form(_form_id: String, user_id: u64) -> Result<impl Reply, warp::Rejection> {
+async fn delete_form(_form_id: String, user_id: i64) -> Result<impl Reply, warp::Rejection> {
     Ok("delete form")
 }
 
-async fn update_form(_form_id: String, user_id: u64, _schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
+async fn update_form(_form_id: String, user_id: i64, _schema: JSONSchema) -> Result<impl Reply, warp::Rejection> {
     Ok("update form")
 }

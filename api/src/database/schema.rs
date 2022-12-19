@@ -18,6 +18,9 @@ diesel::table! {
         username -> Text,
         email -> Text,
         password -> Text,
+        validated -> Bool,
+        admin -> Bool,
+        form_ids -> Array<Nullable<Int4>>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

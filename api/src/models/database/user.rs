@@ -8,6 +8,9 @@ pub struct UserDTO {
     pub username: String,
     pub email: String,
     pub password: String,
+    pub validated: bool,
+    pub admin: bool,
+    pub form_ids: Vec<Option<i32>>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
