@@ -13,21 +13,25 @@ pub enum DbResult<T> {
     Unknown,
 }
 
+impl<T> From<Error> for DbResult<T> {
+    fn from(value: Error) -> Self {
+        match value {
+            Error::NotFound => DbResult::NotFound,
+            Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _) =>
+                DbResult::UniqueViolation,
+            _ => {
+                error!("Database error: {}", value);
+                DbResult::Unknown
+            }
+        }
+    }
+}
+
 impl<T> From<QueryResult<T>> for DbResult<T> {
     fn from(result: QueryResult<T>) -> Self {
         match result {
             Ok(value) => DbResult::Ok(value),
-            Err(error) => {
-                match error {
-                    Error::NotFound => DbResult::NotFound,
-                    Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _) =>
-                        DbResult::UniqueViolation,
-                    _ => {
-                        error!("Database error: {}", error);
-                        DbResult::Unknown
-                    }
-                }
-            }
+            Err(error) => DbResult::from(error)
         }
     }
 }

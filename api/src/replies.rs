@@ -8,10 +8,10 @@ pub struct ApiReply {
 }
 
 impl ApiReply {
-    pub fn new(code: Option<warp::http::StatusCode>, message: String) -> Self {
+    pub fn created(message: impl Into<String>) -> Self {
         Self {
-            code: code.unwrap_or(warp::http::StatusCode::OK),
-            message,
+            code: warp::http::StatusCode::CREATED,
+            message: message.into(),
             success: true,
         }
     }
@@ -19,14 +19,6 @@ impl ApiReply {
     pub fn ok(message: impl Into<String>) -> Self {
         Self {
             code: warp::http::StatusCode::OK,
-            message: message.into(),
-            success: true,
-        }
-    }
-
-    pub fn created(message: impl Into<String>) -> Self {
-        Self {
-            code: warp::http::StatusCode::CREATED,
             message: message.into(),
             success: true,
         }

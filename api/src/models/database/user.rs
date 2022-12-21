@@ -3,7 +3,7 @@ use crate::database::schema::users;
 use crate::models::json::RegisterUserSchema;
 
 #[derive(Debug, Queryable, Clone)]
-pub struct UserDTO {
+pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
@@ -17,15 +17,15 @@ pub struct UserDTO {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = users)]
-pub struct CreateUserDTO<'a> {
+pub struct NewUser<'a> {
     pub username: &'a str,
     pub email: &'a str,
     pub password: &'a str,
 }
 
-impl<'a> From<&'a RegisterUserSchema> for CreateUserDTO<'a> {
+impl<'a> From<&'a RegisterUserSchema> for NewUser<'a> {
     fn from(schema: &'a RegisterUserSchema) -> Self {
-        CreateUserDTO {
+        NewUser {
             username: &schema.username,
             password: &schema.password,
             email: &schema.email,

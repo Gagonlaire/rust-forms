@@ -62,10 +62,6 @@ impl From<Jwt> for ApiReject {
                 message = "Token is valid".to_string();
                 code = StatusCode::OK;
             }
-            _ => {
-                message = "Internal server error".to_string();
-                code = StatusCode::INTERNAL_SERVER_ERROR;
-            }
         }
 
         ApiReject::new(message, code, None)
