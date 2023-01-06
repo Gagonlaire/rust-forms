@@ -1,9 +1,7 @@
 use std::convert::Infallible;
-use jsonschema::JSONSchema;
 use warp::{Filter, reject};
 use crate::database::{DbConnection, DbPool};
 use serde::de::DeserializeOwned;
-use serde_json::Value;
 use warp::body::json;
 use crate::config::Config;
 use crate::rejections::ApiReject;

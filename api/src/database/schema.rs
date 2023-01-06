@@ -6,6 +6,7 @@ diesel::table! {
         name -> Text,
         description -> Text,
         jsonschema -> Jsonb,
+        table_name -> Text,
         created_by -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,

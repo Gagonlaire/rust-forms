@@ -8,7 +8,8 @@ pub struct Form {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub schema: Value,
+    pub jsonschema: Value,
+    pub table_name: String,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -20,15 +21,17 @@ pub struct NewForm<'a> {
     pub name: &'a str,
     pub description: &'a str,
     pub jsonschema: Value,
+    pub table_name: &'a str,
     pub created_by: i32,
 }
 
 impl<'a> NewForm<'a> {
-    pub fn from(schema: &'a FormSchema, user_id: i32) -> Self {
+    pub fn from(schema: &'a FormSchema, user_id: i32, table_name: &'a String) -> Self {
         NewForm {
             name: &schema.name,
             description: &schema.description,
             jsonschema: schema.schema.clone(),
+            table_name: &table_name,
             created_by: user_id,
         }
     }
