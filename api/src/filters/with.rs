@@ -6,6 +6,7 @@ use warp::body::json;
 use crate::config::Config;
 use crate::rejections::ApiReject;
 use crate::utils::jwt::{Jwt, verify_token};
+use crate::models::json::FormSchema;
 
 static DEFAULT_MAX_JSON_SIZE: u64 = 16 * 1024;
 
@@ -33,6 +34,22 @@ pub fn with_json_body<T: DeserializeOwned + Send>(
 ) -> impl Filter<Extract=(T, ), Error=warp::Rejection> + Clone {
     warp::body::content_length_limit(limit.unwrap_or(DEFAULT_MAX_JSON_SIZE))
         .and(json())
+}
+
+pub fn with_form_schema(
+    limit: Option<u64>
+) -> impl Filter<Extract=(FormSchema, ), Error=warp::Rejection> + Clone {
+    with_json_body::<FormSchema>(limit)
+        .and_then(|schema: FormSchema| async move {
+            match schema.validate() {
+                Ok(_) => Ok(schema),
+                Err(error) => Err(reject::custom(
+                    ApiReject::bad_request(
+                        "invalid jsonschema",
+                        Some(vec![error])))
+                )
+            }
+        })
 }
 
 pub fn with_jwt_auth(

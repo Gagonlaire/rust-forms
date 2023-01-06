@@ -16,14 +16,12 @@ pub fn register(config: Config, db_pool: DbPool) -> impl Filter<Extract=impl Rep
         .and(with_config(config.clone()))
         .and(with_db_connection(db_pool.clone()))
         .and_then(login_handler);
-
     let register = warp::path!("register")
         .and(warp::post())
         .and(with_json_body::<RegisterUserSchema>(None))
         .and(with_config(config.clone()))
         .and(with_db_connection(db_pool))
         .and_then(register_handler);
-
     let refresh = warp::path!("refresh")
         .and(warp::post())
         .and(with_json_body::<RefreshTokenSchema>(None))

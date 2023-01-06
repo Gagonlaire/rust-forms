@@ -4,7 +4,6 @@ use crate::database::{DbConnection, DbResult};
 use crate::models::database::{NewForm, Form};
 use crate::models::json::FormSchema;
 use crate::database::schema::forms::dsl::*;
-use crate::utils::forms::build_form_query;
 
 impl DbConnection {
     pub fn create_form(&mut self, schema: &FormSchema, user_id: i32) -> DbResult<Form> {
@@ -20,7 +19,7 @@ impl DbConnection {
         if let Err(error) = diesel::sql_query(query).execute(&mut self.connection) {
             return DbResult::from(error);
         }
-        let query = build_form_query(schema, _table_name);
+        let query = schema.build_form_query(_table_name);
         if let Err(error) = diesel::sql_query(query).execute(&mut self.connection) {
             return DbResult::from(error);
         }

@@ -16,7 +16,7 @@ pub struct Form {
 }
 
 #[derive(Insertable)]
-#[table_name = "forms"]
+#[diesel(table_name = forms)]
 pub struct NewForm<'a> {
     pub name: &'a str,
     pub description: &'a str,
@@ -31,7 +31,7 @@ impl<'a> NewForm<'a> {
             name: &schema.name,
             description: &schema.description,
             jsonschema: schema.schema.clone(),
-            table_name: &table_name,
+            table_name,
             created_by: user_id,
         }
     }
