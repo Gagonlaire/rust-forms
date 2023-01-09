@@ -1,3 +1,4 @@
+use serde_json::json;
 use crate::config::Config;
 use warp::{Filter, Reply};
 use crate::database::{DbConnection, DbPool, DbResult};
@@ -10,9 +11,10 @@ pub fn register(
     config: Config,
     db_pool: DbPool,
 ) -> impl Filter<Extract=impl Reply, Error=warp::Rejection> + Clone {
-    let get_form = warp::path!("forms" / String)
+    let get_form = warp::path!("forms" / i32)
         .and(warp::get())
         .and(with_jwt_auth(config.clone()))
+        .and(with_db_connection(db_pool.clone()))
         .and_then(get_form);
     let create_form = warp::path!("forms")
         .and(warp::post())
@@ -36,8 +38,17 @@ pub fn register(
         .or(delete_form)
 }
 
-async fn get_form(form_id: String, _user_id: i64) -> Result<impl Reply, warp::Rejection> {
-    Ok(format!("get form {form_id}"))
+async fn get_form(
+    form_id: i32,
+    user_id: i64,
+    mut conn: DbConnection,
+) -> Result<impl Reply, warp::Rejection> {
+    match conn.get_form(form_id) {
+        DbResult::Ok(form) => {
+            Ok(warp::reply::json(&form))
+        }
+        _ => Err(warp::reject::custom(ApiReject::internal_error()))
+    }
 }
 
 async fn create_form(

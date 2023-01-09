@@ -10,6 +10,7 @@ const ALLOWED_TYPES: [&str; 3] = ["string", "number", "boolean"];
 pub struct FormSchema {
     pub name: String,
     pub description: String,
+    pub questions: Vec<String>,
     // later converted to json schema
     pub schema: Value,
 }
@@ -25,6 +26,10 @@ impl FormSchema {
         let properties = self.schema.get("properties");
         if properties.is_none() || !properties.unwrap().is_object() {
             return Err("Schema must have an object properties".to_string());
+        }
+        // check if properties length is equal to questions length
+        if properties.unwrap().as_object().unwrap().len() != self.questions.len() {
+            return Err("Schema properties length must be equal to questions length".to_string());
         }
         // check if properties is not empty
         if properties.unwrap().as_object().unwrap().is_empty() {
