@@ -6,7 +6,7 @@ use warp::body::json;
 use crate::config::Config;
 use crate::rejections::ApiReject;
 use crate::utils::jwt::{Jwt, verify_token};
-use crate::models::json::FormSchema;
+use crate::models::json::{FormSchema, JwtPayload};
 
 static DEFAULT_MAX_JSON_SIZE: u64 = 16 * 1024;
 
@@ -54,7 +54,7 @@ pub fn with_form_schema(
 
 pub fn with_jwt_auth(
     config: Config
-) -> impl Filter<Extract=(i64, ), Error=warp::Rejection> + Clone {
+) -> impl Filter<Extract=(JwtPayload, ), Error=warp::Rejection> + Clone {
     warp::header::optional::<String>("Authorization")
         .and(with_config(config))
         .and_then(|token: Option<String>, config: Config| async move {
@@ -66,7 +66,7 @@ pub fn with_jwt_auth(
             let token = token.unwrap();
 
             match verify_token(token.trim_start_matches("Bearer "), &config) {
-                Jwt::Valid(id) => Ok(id),
+                Jwt::Valid(payload) => Ok(payload),
                 error => Err(reject::custom(ApiReject::from(error)))
             }
         })

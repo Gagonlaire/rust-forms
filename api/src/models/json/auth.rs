@@ -21,3 +21,9 @@ pub struct RefreshSuccess {
 pub struct RefreshTokenSchema {
     pub refresh_token: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct JwtPayload {
+    pub id: i32,
+    pub admin: bool,
+}

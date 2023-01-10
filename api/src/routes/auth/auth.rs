@@ -1,9 +1,9 @@
 use crate::config::Config;
-use serde_json::json;
+use serde_json::{to_value};
 use warp::{Filter, Rejection, Reply};
 use crate::database::{DbConnection, DbPool, DbResult};
 use crate::filters::{with_config, with_db_connection, with_json_body};
-use crate::models::json::{LoginSuccess, LoginUserSchema, RefreshSuccess, RefreshTokenSchema, RegisterUserSchema};
+use crate::models::json::{JwtPayload, LoginSuccess, LoginUserSchema, RefreshSuccess, RefreshTokenSchema, RegisterUserSchema};
 use crate::rejections::ApiReject;
 use crate::replies::ApiReply;
 use crate::utils::argon2::{hash_password, verify_password};
@@ -45,17 +45,18 @@ async fn login_handler(
         _ => return Err(warp::reject::custom(ApiReject::internal_error()))
     };
 
-    if !verify_password(&user.password, &user_dto.password) {
+    if !verify_password(&user.password, user_dto.password) {
         return Err(
             warp::reject::custom(
                 ApiReject::unauthorized("Invalid credentials", None)
             )
         );
     }
-    let jwt_payload = json!({
-        "id": user_dto.id,
-    });
-    let tokens = create_tokens(&config, &jwt_payload);
+    let payload = JwtPayload {
+        id: 0,
+        admin: false,
+    };
+    let tokens = create_tokens(&config, &to_value(payload).unwrap());
 
     match tokens {
         None => Err(warp::reject::custom(ApiReject::internal_error())),
@@ -91,14 +92,14 @@ async fn refresh_handler(
     refresh_token: RefreshTokenSchema,
     config: Config,
 ) -> Result<impl Reply, Rejection>  {
-    let user_id = match verify_token(&refresh_token.refresh_token, &config) {
-        Jwt::Valid(user_id) => user_id,
-        error => return Err(warp::reject::custom(ApiReject::unauthorized(error.to_string(), None)))
+    let payload = match verify_token(&refresh_token.refresh_token, &config) {
+        Jwt::Valid(payload) => payload,
+        error => return Err(warp::reject::custom(
+            ApiReject::unauthorized(error.to_string(), None)
+        ))
     };
-    let access_payload = json!({
-        "id": user_id,
-    });
-    let access_token = match create_token(&config, &access_payload, config.jwt_access_expiration) {
+
+    let access_token = match create_token(&config, &to_value(payload).unwrap(), config.jwt_access_expiration) {
         Ok(token) => token,
         Err(_) => return Err(warp::reject::custom(ApiReject::internal_error()))
     };

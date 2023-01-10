@@ -13,6 +13,7 @@ pub struct Form {
     pub description: String,
     pub questions: Vec<Option<String>>,
     pub jsonschema: Value,
+    #[serde(skip_serializing)]
     pub table_name: String,
     pub created_by: i32,
     #[serde(serialize_with = "serialize_timestamp")]

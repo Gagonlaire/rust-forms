@@ -1,7 +1,6 @@
 use chrono::{Utc};
 use diesel::{Connection, QueryResult, RunQueryDsl, sql_types::Integer, sql_query, insert_into, QueryDsl};
 use crate::database::{DbConnection, DbResult};
-use crate::database::schema::forms::created_by;
 use crate::models::database::{NewForm, Form};
 use crate::models::json::FormSchema;
 

@@ -1,17 +1,22 @@
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use crate::database::schema::users;
 use crate::models::json::RegisterUserSchema;
+use crate::utils::{serialize_timestamp};
 
-#[derive(Debug, Queryable, Clone)]
+#[derive(Debug, Queryable, Clone, Serialize)]
 pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String,
     pub validated: bool,
     pub admin: bool,
     pub form_ids: Vec<Option<i32>>,
+    #[serde(serialize_with = "serialize_timestamp")]
     pub created_at: NaiveDateTime,
+    #[serde(serialize_with = "serialize_timestamp")]
     pub updated_at: NaiveDateTime,
 }
 

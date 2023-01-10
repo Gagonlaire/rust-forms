@@ -44,8 +44,8 @@ impl ApiReject {
     }
 }
 
-impl From<Jwt> for ApiReject {
-    fn from(value: Jwt) -> Self {
+impl<T> From<Jwt<T>> for ApiReject {
+    fn from(value: Jwt<T>) -> Self {
         let message;
         let code;
 
