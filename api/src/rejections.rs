@@ -31,7 +31,7 @@ impl ApiReject {
 
     pub fn internal_error() -> Self {
         Self {
-            message: "Internal server error".to_string(),
+            message: "internal server error".to_string(),
             code: StatusCode::INTERNAL_SERVER_ERROR,
             errors: None,
         }
@@ -51,15 +51,15 @@ impl<T> From<Jwt<T>> for ApiReject {
 
         match value {
             Jwt::Expired => {
-                message = "Token expired".to_string();
+                message = "token expired".to_string();
                 code = StatusCode::UNAUTHORIZED;
             },
             Jwt::Invalid => {
-                message = "Invalid token".to_string();
+                message = "invalid token".to_string();
                 code = StatusCode::UNAUTHORIZED;
             },
             Jwt::Valid(_) => {
-                message = "Token is valid".to_string();
+                message = "token is valid".to_string();
                 code = StatusCode::OK;
             }
         }

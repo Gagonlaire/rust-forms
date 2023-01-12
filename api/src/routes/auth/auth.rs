@@ -40,7 +40,7 @@ async fn login_handler(
     let user_dto = match conn.get_user_by_email(&user.email) {
         DbResult::Ok(user) => user,
         DbResult::NotFound => return Err(warp::reject::custom(
-            ApiReject::unauthorized("Invalid credentials", None)
+            ApiReject::unauthorized("invalid credentials", None)
         )),
         _ => return Err(warp::reject::custom(ApiReject::internal_error()))
     };
@@ -48,13 +48,13 @@ async fn login_handler(
     if !verify_password(&user.password, user_dto.password) {
         return Err(
             warp::reject::custom(
-                ApiReject::unauthorized("Invalid credentials", None)
+                ApiReject::unauthorized("invalid credentials", None)
             )
         );
     }
     let payload = JwtPayload {
-        id: 0,
-        admin: false,
+        id: user_dto.id,
+        admin: user_dto.admin,
     };
     let tokens = create_tokens(&config, &to_value(payload).unwrap());
 

@@ -20,22 +20,22 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
 
     if err.is_not_found() {
         code = warp::http::StatusCode::NOT_FOUND;
-        message = "Not Found";
+        message = "not Found";
     } else if let Some(error) = err.find::<ApiReject>() {
         message = error.message.as_str();
         code = error.code;
         errors = error.errors.clone();
     } else if let Some(error) = err.find::<warp::filters::body::BodyDeserializeError>() {
         code = warp::http::StatusCode::BAD_REQUEST;
-        message = "Invalid Body";
+        message = "invalid Body";
         errors = Some(vec![error.to_string()]);
     }  else if err.find::<warp::reject::MethodNotAllowed>().is_some() {
         code = warp::http::StatusCode::METHOD_NOT_ALLOWED;
-        message = "Method Not Allowed";
+        message = "method Not Allowed";
     } else {
         error!("unhandled rejection: {:?}", err);
         code = warp::http::StatusCode::INTERNAL_SERVER_ERROR;
-        message = "Internal Server Error";
+        message = "internal Server Error";
     }
 
     let json = warp::reply::json(&ErrorMessage {

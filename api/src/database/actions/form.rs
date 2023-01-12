@@ -1,5 +1,6 @@
 use chrono::{Utc};
-use diesel::{Connection, QueryResult, RunQueryDsl, sql_types::Integer, sql_query, insert_into, QueryDsl};
+use diesel::{Connection, QueryResult, RunQueryDsl, sql_query, insert_into, QueryDsl};
+use diesel::sql_types::{Text, Integer};
 use crate::database::{DbConnection, DbResult};
 use crate::models::database::{NewForm, Form};
 use crate::models::json::FormSchema;
@@ -30,5 +31,20 @@ impl DbConnection {
         use crate::database::schema::forms::dsl::forms;
 
         DbResult::from(forms.find(form_id).first(&mut self.connection))
+    }
+
+    pub fn delete_form(&mut self, form: &Form) -> DbResult<()> {
+        DbResult::from(self.connection.transaction(|conn| {
+            let queries = vec![
+                format!("DROP TABLE IF EXISTS {}", form.table_name),
+                format!("DELETE FROM forms WHERE id = {}", form.id),
+                format!("UPDATE users SET form_ids = array_remove(form_ids, {}) WHERE id = {}", form.id, form.created_by)
+            ];
+
+            for query in queries {
+                sql_query(query).execute(conn)?;
+            }
+            Ok(())
+        }))
     }
 }
